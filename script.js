@@ -179,7 +179,10 @@ function onEnter(i) {
   const t = pages[i].dataset.title;
   if (t === "Ucapan" && !typedStarted) { typedStarted = true; typeIt(); setTimeout(() => finishTask("baca"), 9000); }
   if (t === "Waktu Kita" && !clockStarted) { clockStarted = true; startClock(); }
-  if (t === "Video") { const c = $("#curtain"); if (c) { c.classList.add("open"); setTimeout(() => c.style.display = "none", 1700); } }
+   if (t === "Video") {
+    const c = $("#curtain"); if (c) { c.classList.add("open"); setTimeout(() => c.style.display = "none", 1700); }
+    startVideoCountdown();
+  } else stopVideoCountdown();
   if (t === "Sertifikat") setTimeout(fitPad, 300);
   if (t === "Penutup") { burst(innerWidth / 2, innerHeight / 2, 26); flash(); }
 }
@@ -211,12 +214,87 @@ $("#envelope").addEventListener("click", (e) => {
 
 /* ───────── musik ───────── */
 const bgm = $("#bgm"), mb = $("#musicBtn");
-mb.addEventListener("click", async () => {
-  try {
-    if (bgm.paused) { await bgm.play(); mb.classList.add("on"); mb.textContent = "🎶"; }
-    else { bgm.pause(); mb.classList.remove("on"); mb.textContent = "🎵"; }
-  } catch { mb.textContent = "🔇"; mb.title = "Taruh lagu di assets/song.mp3"; }
-});
+bgm.volume = PREF.musicVolume;
+if (STATE.music === undefined) STATE.music = PREF.musicOn;   // default: nyala
+
+function setMusicUI(on) {
+  mb.classList.toggle("on", on);
+  mb.textContent = on ? "🎶" : "🎵";
+  mb.title = on ? "Matikan musik" : "Nyalakan musik";
+}
+async function playMusic(silentFail = true) {
+  try { await bgm.play(); STATE.music = true; save(); setMusicUI(true); return true; }
+  catch (e) { if (!silentFail) { mb.textContent = "🔇"; mb.title = "Taruh lagu di assets/song.mp3"; } return false; }
+}
+function stopMusic() { bgm.pause(); STATE.music = false; save(); setMusicUI(false); }
+
+mb.addEventListener("click", () => { bgm.paused ? playMusic(false) : stopMusic(); });
+
+/* musik nyala otomatis; kalau diblokir browser, nyalakan saat sentuhan pertama */
+(function autoMusic() {
+  if (!STATE.music) { setMusicUI(false); return; }
+  setMusicUI(true);
+  playMusic().then(ok => {
+    if (ok) return;
+    const kick = async () => {
+      if (!STATE.music) return off();
+      if (await playMusic()) off();
+    };
+    const off = () => ["pointerdown", "keydown", "touchstart"].forEach(t => removeEventListener(t, kick));
+    ["pointerdown", "keydown", "touchstart"].forEach(t => addEventListener(t, kick));
+  });
+})();
+
+/* redupkan musik saat video jalan, kembalikan setelah selesai */
+const vid = $("#theVideo");
+let duckT = null;
+function fadeTo(target, ms = 600) {
+  clearInterval(duckT);
+  const from = bgm.volume, steps = 20;
+  let i = 0;
+  duckT = setInterval(() => {
+    i++; bgm.volume = Math.max(0, Math.min(1, from + (target - from) * (i / steps)));
+    if (i >= steps) clearInterval(duckT);
+  }, ms / steps);
+}
+vid.addEventListener("play", () => fadeTo(PREF.musicVolume * 0.12));
+["pause", "ended"].forEach(t => vid.addEventListener(t, () => fadeTo(PREF.musicVolume)));
+
+/* ───────── video mulai otomatis setelah jeda ───────── */
+let vidTimer = null, vidTick = null;
+function stopVideoCountdown() {
+  clearTimeout(vidTimer); clearInterval(vidTick);
+  const n = $("#vidNote"); if (n) n.classList.remove("show");
+}
+function startVideoCountdown() {
+  stopVideoCountdown();
+  if (!PREF.videoAutoplay) return;
+  if (!vid.paused) return;
+  const note = $("#vidNote");
+  let left = Math.ceil(PREF.videoDelay / 1000);
+  if (note) { note.textContent = `Videonya mulai dalam ${left}…`; note.classList.add("show"); }
+  vidTick = setInterval(() => {
+    left--;
+    if (note) note.textContent = left > 0 ? `Videonya mulai dalam ${left}…` : "Mulai 🎬";
+    if (left <= 0) clearInterval(vidTick);
+  }, 1000);
+  vidTimer = setTimeout(async () => {
+    try {
+      await vid.play();
+      if (note) { note.textContent = "Selamat menonton 🍿"; setTimeout(() => note.classList.remove("show"), 2200); }
+    } catch {
+      /* browser memblokir suara → putar tanpa suara, kasih tombol unmute */
+      try {
+        vid.muted = true; await vid.play();
+        if (note) { note.innerHTML = "🔇 Ketuk di sini untuk menyalakan suara";
+          note.classList.add("show", "tap");
+          note.onclick = () => { vid.muted = false; note.classList.remove("show", "tap"); note.onclick = null; }; }
+      } catch {
+        if (note) { note.textContent = "Ketuk tombol play untuk mulai ▶"; }
+      }
+    }
+  }, PREF.videoDelay);
+}
 
 /* ───────── bantuan ───────── */
 const help = $("#help");

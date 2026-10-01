@@ -300,3 +300,9 @@ video{width:100%;border-radius:14px;display:block;background:#000;aspect-ratio:1
 .cert-name{text-shadow:0 2px 10px rgba(138,13,58,.18)}
 .cert-signs{position:relative;z-index:2}
 .cert-perks li{display:flex;gap:8px;align-items:flex-start}
+/* ───────── catatan video ───────── */
+.vid-note{margin:14px auto 0;max-width:420px;font-size:.88rem;font-weight:600;color:var(--gold);
+  background:rgba(255,46,99,.14);border:1px solid rgba(255,210,122,.3);padding:9px 18px;border-radius:999px;
+  opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s}
+.vid-note.show{opacity:1;transform:none}
+.vid-note.tap{cursor:pointer;background:rgba(255,46,99,.3);animation:pulse 1.8s infinite}
