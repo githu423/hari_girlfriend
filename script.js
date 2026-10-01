@@ -169,15 +169,7 @@ function onEnter(i) {
   if (t === "Sertifikat") setTimeout(fitPad, 300);
   if (t === "Penutup") { burst(innerWidth / 2, innerHeight / 2, 26); flash(); }
 }
-(function boot() {
-  const start = clamp(STATE.page | 0, 0, pages.length - 1);
-  pages[start].classList.add("active");
-  for (let i = 0; i < start; i++) pages[i].classList.add("prev");
-  cur = start; maxSeen = Math.max(maxSeen, start);
-  sync(); onEnter(start);
-  if (start > 0) { typedStarted = true; $("#typed").textContent = LINES[LINES.length - 1]; $("#envelope").classList.add("open"); }
-  if (start > 0) { const t = $("#resumeMsg"); if (t) { t.textContent = "Dilanjut dari halaman terakhir kamu 💗"; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 3200); } }
-})();
+/* boot dipanggil di akhir file */
 
 /* ───────── sampul: tombol "Bukan" kabur ───────── */
 const NO_TEASE = ["eh? coba lagi deh 👀", "bohong ah, kamu Sinta kok 😏", "tombolnya malu-malu 🙈",
@@ -731,3 +723,15 @@ $("#loveBtn").addEventListener("click", (e) => {
   flash();
 });
 $("#againBtn").addEventListener("click", resetAll);
+
+/* ───────── mulai ───────── */
+(function boot() {
+  const start = clamp(STATE.page | 0, 0, pages.length - 1);
+  pages[start].classList.add("active");
+  for (let i = 0; i < start; i++) pages[i].classList.add("prev");
+  cur = start; maxSeen = Math.max(maxSeen, start);
+  if (start > 0) $("#envelope").classList.add("open");
+  if (start > 2) { typedStarted = true; $("#typed").textContent = LINES[LINES.length - 1]; }
+  sync(); onEnter(start);
+  if (start > 0) { const t = $("#resumeMsg"); if (t) { t.textContent = "Dilanjut dari halaman terakhir kamu 💗"; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 3200); } }
+})();
