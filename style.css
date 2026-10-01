@@ -234,3 +234,6 @@ video{width:100%;border-radius:14px;display:block;background:#000;aspect-ratio:1
 .finale-sub{font-family:var(--hand);font-size:1.6rem;color:var(--rose2);margin-top:14px}
 @keyframes pulse2{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- fix: atribut [hidden] harus selalu menang ---------- */
+[hidden]{display:none!important}
