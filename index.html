@@ -11,7 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌹</text></svg>" />
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500;1,700&family=Quicksand:wght@400;500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=5" />
+<link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
 
@@ -252,7 +252,8 @@
 
       <div class="row">
         <button id="clearSig" class="btn ghost">Hapus Coretan</button>
-        <button id="saveCert" class="btn">Sahkan &amp; Simpan 📜</button>
+        <button id="previewCert" class="btn ghost">Lihat Hasil 👀</button>
+        <button id="saveCert" class="btn">Sahkan &amp; Download 📜</button>
       </div>
       <p id="certStatus" class="tiny muted center-t">Belum ditandatangani…</p>
     </div>
@@ -267,7 +268,7 @@
         Kalau boleh milih lagi dari awal, aku tetap milih kamu. Setiap kali. 🤍</p>
       <p class="handsign">— Ibah Misbah</p>
       <div class="row">
-        <button id="againBtn" class="btn ghost">↺ Baca dari awal</button>
+        <button id="againBtn" class="btn ghost">↺ Ulang dari awal (hapus progres)</button>
         <button id="loveBtn" class="btn">Aku juga sayang kamu ❤️</button>
       </div>
       <p id="loveMsg" class="hint">&nbsp;</p>
@@ -282,6 +283,7 @@
   <button id="next" class="nav-btn primary" aria-label="Halaman berikutnya">›</button>
 </nav>
 <p id="lockMsg" class="lock-msg">&nbsp;</p>
+<p id="resumeMsg" class="resume-msg">&nbsp;</p>
 
 <!-- bantuan -->
 <div id="help" class="modal" hidden style="display:none">
@@ -294,7 +296,16 @@
   </div>
 </div>
 
+<div id="preview" class="modal" hidden style="display:none">
+  <div class="modal-box wide">
+    <h3>Pratinjau Sertifikat 📜</h3>
+    <img id="previewImg" alt="Pratinjau sertifikat" />
+    <p class="tiny muted">Ini persis file PNG yang akan kamu download (2000×1414 px).</p>
+    <button class="btn" id="previewClose">Tutup</button>
+  </div>
+</div>
+
 <audio id="bgm" loop preload="none"><source src="assets/song.mp3" type="audio/mpeg"></audio>
-<script src="script.js?v=5"></script>
+<script src="script.js?v=6"></script>
 </body>
 </html>

@@ -6,8 +6,21 @@
 const CONFIG = {
   pacar: "Sinta Liya",
   aku: "Ibah Misbah",
-  jadian: new Date(2023, 0, 14, 19, 30, 0), // ← ganti tanggal jadian kalian (bulan dimulai dari 0)
+  // hitungan hari dimulai dari 1 Januari 2026
+  jadian: new Date(2026, 0, 1, 0, 0, 0),
 };
+
+/* ───────── penyimpanan (tahan refresh) ───────── */
+const KEY = "mygirlday-sinta-v1";
+const STATE = Object.assign({
+  page: 0, maxSeen: 0, tasks: {}, roses: [], roseMsg: "", quizIndex: 0, quizDone: false,
+  dollPlays: 0, dollMsg: "", dressed: false, heartPct: 0, unlocked: false,
+  signature: "", sealed: false, gateOpen: false, music: false, loveIndex: 0
+}, (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })());
+let saveT;
+function save() { clearTimeout(saveT); saveT = setTimeout(() => {
+  try { localStorage.setItem(KEY, JSON.stringify(STATE)); } catch {} }, 120); }
+function resetAll() { try { localStorage.removeItem(KEY); } catch {} location.reload(); }
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
@@ -69,7 +82,8 @@ const TASKS = {
   heart:{ done: false, msg: "Tahan hatinya sampai 100% dulu ya 💗" },
   sign: { done: false, msg: "Tanda tangan dulu di kotaknya 🖊️" },
 };
-let cur = 0, maxSeen = 0;
+Object.keys(TASKS).forEach(k => { if (STATE.tasks[k]) TASKS[k].done = true; });
+let cur = 0, maxSeen = Math.min(STATE.maxSeen | 0, 10);
 
 const dotsBox = $("#dots");
 pages.forEach((p, i) => {
@@ -95,6 +109,7 @@ function go(i, dir = i > cur ? 1 : -1) {
   pages[i].classList.add("active");
   pages[i].scrollTop = 0;
   cur = i; maxSeen = Math.max(maxSeen, i);
+  STATE.page = i; STATE.maxSeen = maxSeen; save();
   sync();
   onEnter(i);
 }
@@ -122,7 +137,7 @@ function tryNext() {
 }
 function finishTask(key) {
   if (!TASKS[key] || TASKS[key].done) return;
-  TASKS[key].done = true;
+  TASKS[key].done = true; STATE.tasks[key] = true; save();
   if (pages[cur].dataset.task === key) { sync(); nudge("Selesai! Lanjut ke halaman berikutnya ›"); flash(); }
 }
 
@@ -154,7 +169,15 @@ function onEnter(i) {
   if (t === "Sertifikat") setTimeout(fitPad, 300);
   if (t === "Penutup") { burst(innerWidth / 2, innerHeight / 2, 26); flash(); }
 }
-pages[0].classList.add("active"); sync();
+(function boot() {
+  const start = clamp(STATE.page | 0, 0, pages.length - 1);
+  pages[start].classList.add("active");
+  for (let i = 0; i < start; i++) pages[i].classList.add("prev");
+  cur = start; maxSeen = Math.max(maxSeen, start);
+  sync(); onEnter(start);
+  if (start > 0) { typedStarted = true; $("#typed").textContent = LINES[LINES.length - 1]; $("#envelope").classList.add("open"); }
+  if (start > 0) { const t = $("#resumeMsg"); if (t) { t.textContent = "Dilanjut dari halaman terakhir kamu 💗"; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 3200); } }
+})();
 
 /* ───────── sampul: tombol "Bukan" kabur ───────── */
 const NO_TEASE = ["eh? coba lagi deh 👀", "bohong ah, kamu Sinta kok 😏", "tombolnya malu-malu 🙈",
@@ -262,13 +285,14 @@ const ACT = {
   dandan: ["Ganteng nggak? 🎀", "Dasi kupu-kupu mode: ON 😎", "Siap jadi pendamping kamu! 🤵"],
   rahasia: ["…dia nyimpen fotomu di home screen 📱", "…dia bikin web ini sampai begadang 😵", "…dia bilang kamu cinta terakhirnya 🤍"]
 };
-let di = 0, dollPlays = 0;
+let di = 0, dollPlays = STATE.dollPlays | 0;
 const bubble = $("#dollBubble"), doll = $("#doll");
 function say(txt, cls = "hit") {
   doll.classList.remove("hit", "jump"); void doll.offsetWidth; doll.classList.add(cls);
   bubble.textContent = txt;
   bubble.style.animation = "none"; void bubble.offsetWidth; bubble.style.animation = "";
-  if (++dollPlays >= 3) finishTask("doll");
+  dollPlays++; STATE.dollPlays = dollPlays; STATE.dollMsg = txt; save();
+  if (dollPlays >= 3) finishTask("doll");
 }
 doll.addEventListener("click", (e) => {
   di = (di + 1) % DOLL.length; say(DOLL[di]);
@@ -277,10 +301,14 @@ doll.addEventListener("click", (e) => {
 $$(".chips .chip").forEach(b => b.addEventListener("click", (e) => {
   const k = b.dataset.act, a = ACT[k];
   say(a[(Math.random() * a.length) | 0], "jump");
-  if (k === "dandan") { $("#bowtie").setAttribute("opacity", "1"); $("#hat").setAttribute("opacity", "1"); }
+  if (k === "dandan") { dressUp(); }
   const em = { peluk: ["🤗", "💗"], kasih: ["🍰", "🍩", "✨"], dandan: ["🎀", "✨"], rahasia: ["🤫", "💌"] }[k];
   burst(e.clientX, e.clientY, 11, em);
 }));
+function dressUp() { $("#bowtie").setAttribute("opacity", "1"); $("#hat").setAttribute("opacity", "1"); STATE.dressed = true; save(); }
+if (STATE.dressed) dressUp();
+if (STATE.dollMsg) bubble.textContent = STATE.dollMsg;
+
 const pupils = $("#pupils");
 addEventListener("pointermove", (e) => {
   const r = doll.getBoundingClientRect(); if (!r.width) return;
@@ -314,6 +342,7 @@ ROSES.forEach((msg, i) => {
     <path d="M12 20q15-9 30 0" stroke="rgba(255,255,255,.35)" stroke-width="2" fill="none"/></g></svg>`;
   b.addEventListener("click", (e) => {
     b.classList.add("picked"); picked.add(i);
+    STATE.roses = [...picked]; STATE.roseMsg = msg; save();
     const m = $("#roseMsg"); m.style.opacity = 0;
     setTimeout(() => { m.textContent = "“" + msg + "”"; m.style.opacity = 1; }, 150);
     $("#roseBar").style.width = (picked.size / ROSES.length * 100) + "%";
@@ -327,6 +356,16 @@ ROSES.forEach((msg, i) => {
   });
   bq.appendChild(b);
 });
+/* pulihkan mawar yang sudah dipetik */
+if (STATE.roses && STATE.roses.length) {
+  const st = [...bq.children];
+  STATE.roses.forEach(i => st[i] && st[i].classList.add("picked"));
+  picked.clear(); STATE.roses.forEach(i => picked.add(i));
+  $("#roseBar").style.width = (picked.size / ROSES.length * 100) + "%";
+  $("#roseCount").textContent = `${picked.size} / ${ROSES.length} mawar dipetik`;
+  if (STATE.roseMsg) $("#roseMsg").textContent = "“" + STATE.roseMsg + "”";
+  if (picked.size === ROSES.length) $("#roseCount").innerHTML = "<b>Buketnya lengkap 💐 — semuanya buat kamu, Sinta.</b>";
+}
 
 /* ───────── kuis ───────── */
 const QUIZ = [
@@ -341,7 +380,7 @@ const QUIZ = [
   { q: "Terakhir: mau nggak dicintai Ibah terus-terusan?", o: ["Mau banget ❤️", "Iya dong", "Udah dari dulu"],
     f: "Alhamdulillah. Perjanjian sah 🎉" }
 ];
-let qi = 0;
+let qi = STATE.quizIndex | 0;
 function renderQ() {
   const Q = QUIZ[qi];
   $("#qText").textContent = Q.q;
@@ -357,7 +396,8 @@ function renderQ() {
       $("#qFeed").textContent = Q.f;
       burst(e.clientX, e.clientY, 10, ["✅", "💖", "🌹"]);
       setTimeout(() => {
-        if (++qi < QUIZ.length) renderQ();
+        qi++; STATE.quizIndex = qi; save();
+        if (qi < QUIZ.length) renderQ();
         else {
           $("#qText").textContent = "Skor kamu: 100/100 🏆";
           box.innerHTML = "";
@@ -365,17 +405,23 @@ function renderQ() {
           $("#qFeed").textContent = "Sempurna. Ya iyalah, semua jawabannya kamu 😚";
           $("#qProg").textContent = "Lulus dengan predikat: Pacar Teladan";
           burst(innerWidth / 2, innerHeight / 2, 26, ["🏆", "🎉", "❤️"]);
-          finishTask("quiz");
+          STATE.quizDone = true; save(); finishTask("quiz");
         }
       }, 1150);
     });
     box.appendChild(b);
   });
 }
-renderQ();
+if (STATE.quizDone || qi >= QUIZ.length) {
+  $("#qText").textContent = "Skor kamu: 100/100 🏆";
+  $("#qOpts").innerHTML = "";
+  $("#qFeed").classList.add("big");
+  $("#qFeed").textContent = "Sempurna. Ya iyalah, semua jawabannya kamu 😚";
+  $("#qProg").textContent = "Lulus dengan predikat: Pacar Teladan";
+} else renderQ();
 
 /* ───────── tahan hati ───────── */
-let pct = 0, holding = false, unlocked = false, raf = null;
+let pct = STATE.unlocked ? 100 : 0, holding = false, unlocked = !!STATE.unlocked, raf = null;
 const TEASE = ["tekan dan <b>tahan</b> ya… 😳", "nah gitu, jangan dilepas 💗", "setengah jalan, kamu kuat!",
   "dikit lagi sayang 🥺", "WAAA HAMPIR PENUH!! 🔥"];
 const hb = $("#heartBtn");
@@ -394,6 +440,8 @@ function decay() {
   if (holding || unlocked || pct <= 0) return;
   pct = Math.max(0, pct - .5); update(); requestAnimationFrame(decay);
 }
+if (unlocked) { update(); $("#heartTease").innerHTML = "<b>Sudah kebuka 🎬 lanjut ke halaman videonya</b>"; }
+
 hb.addEventListener("pointerdown", (e) => {
   if (unlocked) return; e.preventDefault();
   holding = true; hb.classList.add("beat"); cancelAnimationFrame(raf); loopHold(); burstAt(hb, 3);
@@ -410,13 +458,17 @@ function unlockVideo() {
   $("#heartPct").textContent = "100%";
   $("#heartTease").innerHTML = "<b>Kebuka! Lanjut ke halaman berikutnya 🎬</b>";
   burstAt(hb, 40); flash();
-  finishTask("heart");
+  STATE.unlocked = true; save(); finishTask("heart");
   setTimeout(() => go(cur + 1, 1), 1100);
 }
 
 /* ───────── sertifikat ───────── */
-$("#certDate").textContent = "Ditetapkan pada " + new Date().toLocaleDateString("id-ID",
-  { weekday: "long", day: "numeric", month: "long", year: "numeric" }) + " • Dibuat dengan sepenuh hati";
+if (!STATE.certDate) { STATE.certDate = new Date().toISOString(); save(); }
+const CERT_DATE = new Date(STATE.certDate);
+const CERT_DATE_STR = CERT_DATE.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+if (!STATE.serial) { STATE.serial = "SL-" + CERT_DATE.getFullYear() + "-" + String(Math.floor(rnd(100, 999))); save(); }
+$("#certDate").textContent = "Ditetapkan pada " + CERT_DATE_STR + " • No. " + STATE.serial;
+$("#certSerial") && ($("#certSerial").textContent = "No. " + STATE.serial);
 
 const pad = $("#sigPad"), px = pad.getContext("2d");
 let drawing = false, signed = false, last = null, ink = 0;
@@ -427,7 +479,8 @@ function fitPad() {
   pad.width = r.width * dpr; pad.height = r.height * dpr;
   px.setTransform(dpr, 0, 0, dpr, 0, 0);
   px.lineCap = "round"; px.lineJoin = "round"; px.strokeStyle = "#8a0d3a";
-  if (img) { const i = new Image(); i.onload = () => px.drawImage(i, 0, 0, r.width, r.height); i.src = img; }
+  const src = img || STATE.signature;
+  if (src) { const i = new Image(); i.onload = () => px.drawImage(i, 0, 0, r.width, r.height); i.src = src; }
 }
 addEventListener("resize", () => setTimeout(fitPad, 150));
 const ppos = (e) => { const r = pad.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
@@ -444,19 +497,190 @@ pad.addEventListener("pointermove", (e) => {
     finishTask("sign");
   }
 });
-["pointerup", "pointercancel", "pointerleave"].forEach(t => pad.addEventListener(t, () => drawing = false));
+const endDraw = () => { if (!drawing) return; drawing = false; if (signed) { try { STATE.signature = pad.toDataURL("image/png"); save(); } catch {} } };
+["pointerup", "pointercancel", "pointerleave"].forEach(t => pad.addEventListener(t, endDraw));
 
 $("#clearSig").addEventListener("click", () => {
   px.clearRect(0, 0, pad.width, pad.height); signed = false; ink = 0;
+  STATE.signature = ""; STATE.sealed = false; STATE.tasks.sign = false; TASKS.sign.done = false; save(); sync();
   $("#padHint").style.display = ""; $("#wax").classList.remove("on");
   $("#certStatus").textContent = "Belum ditandatangani…";
 });
+/* pulihkan tanda tangan tersimpan */
+if (STATE.signature) {
+  signed = true; ink = 999;
+  $("#padHint").style.display = "none";
+  $("#certStatus").textContent = "Tanda tangan kamu tersimpan ✨";
+  setTimeout(fitPad, 200);
+  if (STATE.sealed) { $("#wax").classList.add("on"); $("#certStatus").textContent = "Sertifikat sudah disahkan 🌹 bisa di-download lagi kapan aja."; }
+}
+
+$("#previewClose").addEventListener("click", () => { const m = $("#preview"); m.hidden = true; m.style.display = "none"; });
+$("#preview").addEventListener("click", (e) => { if (e.target.id === "preview") { e.currentTarget.hidden = true; e.currentTarget.style.display = "none"; } });
+
 $("#sigImg").addEventListener("error", function () {
   const w = document.createElement("div");
   w.style.cssText = 'font-family:"Caveat",cursive;font-size:2.3rem;color:#8a0d3a;transform:rotate(-7deg)';
   w.textContent = CONFIG.aku;
   this.replaceWith(w);
 });
+
+/* ══ render sertifikat resolusi tinggi (tanpa library) ══ */
+const CW = 2000, CH = 1414;  // rasio A4 landscape @ ±170 dpi
+
+function roundRect(c, x, y, w, h, r) {
+  c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r);
+  c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+}
+function drawRose(c, x, y, R) {
+  const g = c.createRadialGradient(x - R * .25, y - R * .3, R * .1, x, y, R);
+  g.addColorStop(0, "#ff7a9c"); g.addColorStop(1, "#a3002a");
+  c.fillStyle = g; c.beginPath(); c.arc(x, y, R, 0, 6.3); c.fill();
+  c.strokeStyle = "rgba(255,255,255,.35)"; c.lineWidth = R * .07;
+  for (let i = 1; i <= 4; i++) { c.beginPath(); c.arc(x, y, R * (1 - i * .19), 0, 6.3); c.stroke(); }
+  c.fillStyle = "#ffd6e2"; c.beginPath(); c.arc(x, y, R * .12, 0, 6.3); c.fill();
+}
+function wrap(c, text, x, y, maxW, lh) {
+  const words = text.split(" "); let line = "", yy = y;
+  for (const w of words) {
+    if (c.measureText(line + w + " ").width > maxW && line) { c.fillText(line.trim(), x, yy); line = w + " "; yy += lh; }
+    else line += w + " ";
+  }
+  c.fillText(line.trim(), x, yy); return yy + lh;
+}
+function loadImg(src) {
+  return new Promise((res) => { const i = new Image(); i.crossOrigin = "anonymous";
+    i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
+}
+
+async function renderCertificate() {
+  const cv = document.createElement("canvas");
+  cv.width = CW; cv.height = CH;
+  const c = cv.getContext("2d");
+  try { await document.fonts.ready; } catch {}
+
+  /* latar krem bergradasi + tekstur lembut */
+  const bg = c.createLinearGradient(0, 0, CW, CH);
+  bg.addColorStop(0, "#fffdf7"); bg.addColorStop(.5, "#fff6f1"); bg.addColorStop(1, "#ffeef4");
+  c.fillStyle = bg; c.fillRect(0, 0, CW, CH);
+  const glow1 = c.createRadialGradient(0, 0, 0, 0, 0, CW * .5);
+  glow1.addColorStop(0, "rgba(255,46,99,.10)"); glow1.addColorStop(1, "transparent");
+  c.fillStyle = glow1; c.fillRect(0, 0, CW, CH);
+  const glow2 = c.createRadialGradient(CW, CH, 0, CW, CH, CW * .5);
+  glow2.addColorStop(0, "rgba(201,162,39,.16)"); glow2.addColorStop(1, "transparent");
+  c.fillStyle = glow2; c.fillRect(0, 0, CW, CH);
+
+  /* watermark mawar besar */
+  c.save(); c.globalAlpha = .05; drawRose(c, CW / 2, CH / 2 + 40, 420); c.restore();
+
+  /* bingkai emas ganda */
+  const m = 56;
+  c.strokeStyle = "#c9a227"; c.lineWidth = 8; roundRect(c, m, m, CW - m * 2, CH - m * 2, 28); c.stroke();
+  c.strokeStyle = "#e3c565"; c.lineWidth = 3; roundRect(c, m + 20, m + 20, CW - (m + 20) * 2, CH - (m + 20) * 2, 18); c.stroke();
+  /* ornamen sudut */
+  c.strokeStyle = "#c9a227"; c.lineWidth = 5;
+  const L = 86, o = m + 46;
+  [[o, o, 1, 1], [CW - o, o, -1, 1], [o, CH - o, 1, -1], [CW - o, CH - o, -1, -1]].forEach(([x, y, sx, sy]) => {
+    c.beginPath(); c.moveTo(x + sx * L, y); c.lineTo(x, y); c.lineTo(x, y + sy * L); c.stroke();
+    c.beginPath(); c.arc(x + sx * 18, y + sy * 18, 9, 0, 6.3); c.fillStyle = "#c9a227"; c.fill();
+  });
+
+  const cx = CW / 2;
+  c.textAlign = "center"; c.textBaseline = "alphabetic";
+
+  /* kepala */
+  c.fillStyle = "#a07b14"; c.font = '600 26px Quicksand, sans-serif';
+  c.fillText("S  E  R  T  I  F  I  K  A  T     R  E  S  M  I", cx, 206);
+
+  c.fillStyle = "#b3002d"; c.font = '700 italic 104px "Playfair Display", Georgia, serif';
+  c.fillText("Happy My Girl Day", cx, 318);
+
+  /* garis hias + mawar */
+  const ry = 366;
+  const lg = c.createLinearGradient(cx - 420, 0, cx + 420, 0);
+  lg.addColorStop(0, "rgba(201,162,39,0)"); lg.addColorStop(.5, "#c9a227"); lg.addColorStop(1, "rgba(201,162,39,0)");
+  c.strokeStyle = lg; c.lineWidth = 3;
+  c.beginPath(); c.moveTo(cx - 420, ry); c.lineTo(cx - 44, ry); c.stroke();
+  c.beginPath(); c.moveTo(cx + 44, ry); c.lineTo(cx + 420, ry); c.stroke();
+  drawRose(c, cx, ry, 26);
+
+  c.fillStyle = "#6b3449"; c.font = '500 30px Quicksand, sans-serif';
+  c.fillText("Dengan ini dinyatakan bahwa", cx, 442);
+
+  /* nama */
+  c.fillStyle = "#8a0d3a"; c.font = '700 italic 118px "Playfair Display", Georgia, serif';
+  c.fillText(CONFIG.pacar, cx, 566);
+  c.strokeStyle = "rgba(138,13,58,.3)"; c.lineWidth = 2;
+  c.beginPath(); c.moveTo(cx - 330, 594); c.lineTo(cx + 330, 594); c.stroke();
+
+  c.fillStyle = "#6b3449"; c.font = '500 31px Quicksand, sans-serif';
+  let y = wrap(c, "secara sah, sadar, dan tanpa paksaan sedikit pun ditetapkan sebagai Wanita Kesayangan satu-satunya dari " + CONFIG.aku + ",", cx, 652, 1300, 46);
+
+  /* hak istimewa */
+  const perks = ["Pelukan tak terbatas, kapan pun diminta", "Dibelain terus, walaupun lagi salah",
+    "Didengerin curhatnya sampai tuntas", "Dikasih mawar merah tanpa perlu alasan",
+    "Dikangenin setiap hari, tanpa jeda"];
+  c.textAlign = "left";
+  const px0 = cx - 430; let py = y + 26;
+  c.font = '600 29px Quicksand, sans-serif';
+  perks.forEach((t, i) => {
+    const yy = py + i * 46;
+    c.fillStyle = "#c9a227"; c.beginPath(); c.arc(px0 - 26, yy - 10, 7, 0, 6.3); c.fill();
+    c.fillStyle = "#5a2a3d"; c.fillText(t, px0, yy);
+  });
+  c.textAlign = "center";
+  c.fillStyle = "#8b6274"; c.font = 'italic 500 25px Quicksand, sans-serif';
+  c.fillText("Berlaku seumur hidup. Tidak dapat dibatalkan, dialihkan, atau ditukar.", cx, py + perks.length * 46 + 26);
+
+  /* stempel lilin */
+  const sx2 = CW - 230, sy2 = 240;
+  c.save(); c.translate(sx2, sy2); c.rotate(-.14);
+  const wg = c.createRadialGradient(-18, -20, 8, 0, 0, 86);
+  wg.addColorStop(0, "#ff6b8c"); wg.addColorStop(1, "#8e0030");
+  c.fillStyle = wg; c.beginPath();
+  for (let i = 0; i < 28; i++) { const a = i / 28 * 6.283, r = 80 + Math.sin(i * 3.1) * 7;
+    i ? c.lineTo(Math.cos(a) * r, Math.sin(a) * r) : c.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+  c.closePath(); c.fill();
+  c.strokeStyle = "rgba(255,255,255,.4)"; c.lineWidth = 3; c.beginPath(); c.arc(0, 0, 60, 0, 6.3); c.stroke();
+  drawRose(c, 0, 0, 34);
+  c.restore();
+
+  /* tanda tangan */
+  const sigY = CH - 290, colW = 520;
+  const cols = [{ x: cx - 330, name: CONFIG.aku, role: "Pemberi Hadiah" },
+                { x: cx + 330, name: CONFIG.pacar, role: "Penerima Hadiah" }];
+
+  const sigIbah = await loadImg("assets/signature.png");
+  if (sigIbah && sigIbah.width) {
+    const h = 150, w = Math.min(colW - 40, sigIbah.width / sigIbah.height * h);
+    c.drawImage(sigIbah, cols[0].x - w / 2, sigY - h, w, h);
+  } else {
+    c.fillStyle = "#8a0d3a"; c.font = '600 84px Caveat, cursive';
+    c.save(); c.translate(cols[0].x, sigY - 24); c.rotate(-.1); c.fillText(CONFIG.aku, 0, 0); c.restore();
+  }
+
+  if (STATE.signature) {
+    const si = await loadImg(STATE.signature);
+    if (si) { const h = 150, w = Math.min(colW - 40, si.width / si.height * h);
+      c.drawImage(si, cols[1].x - w / 2, sigY - h, w, h); }
+  }
+
+  cols.forEach(col => {
+    c.strokeStyle = "#3a1326"; c.globalAlpha = .55; c.lineWidth = 3;
+    c.beginPath(); c.moveTo(col.x - colW / 2, sigY + 6); c.lineTo(col.x + colW / 2, sigY + 6); c.stroke();
+    c.globalAlpha = 1;
+    c.fillStyle = "#3a1326"; c.font = '600 38px "Playfair Display", Georgia, serif';
+    c.fillText(col.name, col.x, sigY + 56);
+    c.fillStyle = "#8b6274"; c.font = '500 24px Quicksand, sans-serif';
+    c.fillText(col.role, col.x, sigY + 92);
+  });
+
+  /* kaki */
+  c.fillStyle = "#8b6274"; c.font = '500 24px Quicksand, sans-serif';
+  c.fillText("Ditetapkan pada " + CERT_DATE_STR + "   •   No. " + STATE.serial + "   •   Dibuat dengan sepenuh hati", cx, CH - 96);
+
+  return cv;
+}
 
 $("#saveCert").addEventListener("click", async () => {
   if (!signed) {
@@ -465,33 +689,45 @@ $("#saveCert").addEventListener("click", async () => {
       { transform: "translateX(9px)" }, { transform: "translateX(0)" }], { duration: 340 });
     return;
   }
+  const btn = $("#saveCert"); btn.disabled = true;
   $("#wax").classList.add("on"); $("#cert").classList.add("sealed");
-  $("#certStatus").textContent = "Menyiapkan sertifikat…";
+  STATE.sealed = true; save();
+  $("#certStatus").textContent = "Menyiapkan sertifikat resolusi tinggi…";
   try {
-    if (!window.html2canvas) await new Promise((res, rej) => {
-      const s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
-      s.onload = res; s.onerror = rej; document.head.appendChild(s);
-    });
-    const cv = await html2canvas($("#cert"), { backgroundColor: "#fffaf2", scale: 2, useCORS: true });
-    const a = document.createElement("a");
-    a.download = "Sertifikat-My-Girl-Day-Sinta-Liya.png";
-    a.href = cv.toDataURL("image/png"); a.click();
-    $("#certStatus").textContent = "Tersimpan! Simpan baik-baik ya, itu sah seumur hidup 😌";
-  } catch {
-    $("#certStatus").textContent = "Gagal simpan otomatis — screenshot aja ya, tetap sah kok 😄";
+    const cv = await renderCertificate();
+    await new Promise(r => cv.toBlob(b => {
+      const url = URL.createObjectURL(b);
+      const a = document.createElement("a");
+      a.download = "Sertifikat-My-Girl-Day-" + CONFIG.pacar.replace(/ /g, "-") + ".png";
+      a.href = url; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 4000); r();
+    }, "image/png"));
+    $("#certStatus").textContent = "Tersimpan! 2000×1414 px, siap dicetak 😌 Sah seumur hidup.";
+    burstAt($("#cert"), 26, ["📜", "🌹", "❤️", "✨"]); flash();
+  } catch (e) {
+    $("#certStatus").textContent = "Gagal menyimpan — coba sekali lagi ya 🙏";
   }
-  setTimeout(() => go(cur + 1, 1), 900);
+  btn.disabled = false;
+  setTimeout(() => go(cur + 1, 1), 1100);
+});
+
+$("#previewCert") && $("#previewCert").addEventListener("click", async () => {
+  $("#certStatus").textContent = "Membuat pratinjau…";
+  const cv = await renderCertificate();
+  $("#previewImg").src = cv.toDataURL("image/png");
+  const m2 = $("#preview"); m2.hidden = false; m2.style.display = "grid";
+  $("#certStatus").textContent = "Ini tampilan file yang akan kamu download 👀";
 });
 
 /* ───────── penutup ───────── */
 const LOVE = ["Aku tahu 😌 tapi seneng banget dengernya.", "Ulangi lagi dong, aku suka 🥺",
   "Kamu yang terbaik, Sinta. Beneran. 🤍", "Oke, sekarang aku senyum sendiri. Makasih ya ❤️",
   "Deal: kita tua bareng ya 🌹"];
-let li2 = 0;
+let li2 = STATE.loveIndex | 0;
 $("#loveBtn").addEventListener("click", (e) => {
   burst(e.clientX, e.clientY, 22);
   $("#loveMsg").textContent = LOVE[li2++ % LOVE.length];
+  STATE.loveIndex = li2; save();
   flash();
 });
-$("#againBtn").addEventListener("click", () => location.reload());
+$("#againBtn").addEventListener("click", resetAll);

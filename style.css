@@ -284,3 +284,19 @@ video{width:100%;border-radius:14px;display:block;background:#000;aspect-ratio:1
   .nav-label{min-width:0;display:none}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ───────── pratinjau & pesan lanjut ───────── */
+.modal-box.wide{max-width:min(900px,94vw)}
+.modal-box.wide img{width:100%;border-radius:12px;margin:12px 0;box-shadow:0 14px 40px rgba(0,0,0,.5);background:#fff}
+.resume-msg{position:fixed;left:50%;top:66px;transform:translateX(-50%);z-index:62;margin:0;font-size:.8rem;
+  color:#ffd9e4;background:rgba(25,3,18,.8);border:1px solid var(--line);padding:7px 16px;border-radius:999px;
+  opacity:0;transition:opacity .4s;pointer-events:none;white-space:nowrap}
+.resume-msg.show{opacity:1}
+
+/* sertifikat di layar: sedikit lebih mewah */
+.cert-border{background:
+  radial-gradient(circle at 50% 58%,rgba(255,46,99,.05) 0 160px,transparent 161px),
+  repeating-linear-gradient(45deg,rgba(201,162,39,.035) 0 2px,transparent 2px 9px)}
+.cert-name{text-shadow:0 2px 10px rgba(138,13,58,.18)}
+.cert-signs{position:relative;z-index:2}
+.cert-perks li{display:flex;gap:8px;align-items:flex-start}
