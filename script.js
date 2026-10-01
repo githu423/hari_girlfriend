@@ -415,13 +415,13 @@ $("#saveCert").addEventListener("click", async () => {
 });
 
 function finale() {
-  const f = $("#finale"); f.hidden = false;
+  const f = $("#finale"); f.hidden = false; f.style.display = "grid";
   let n = 0;
   const t = setInterval(() => {
     burst(rnd(0, innerWidth), innerHeight * rnd(.25, .85), 6);
     if (++n > 30) clearInterval(t);
   }, 150);
-  const close = () => f.hidden = true;
+  const close = () => { f.hidden = true; f.style.display = "none"; };
   f.addEventListener("click", close, { once: true });
   setTimeout(close, 8000);
 }
