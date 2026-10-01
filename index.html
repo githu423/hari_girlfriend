@@ -6,189 +6,237 @@
 <title>Happy My Girl Day — Sinta Liya 🌹</title>
 <meta name="description" content="Hadiah kecil dari Ibah Misbah untuk wanita kesayangannya, Sinta Liya." />
 <meta name="theme-color" content="#1b0410" />
+<meta property="og:title" content="Happy My Girl Day, Sinta Liya 🌹" />
+<meta property="og:description" content="Dibuka khusus untuk kamu. Dari Ibah Misbah." />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌹</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500;1,700&family=Quicksand:wght@400;600;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <canvas id="petals" aria-hidden="true"></canvas>
 <div id="hearts" aria-hidden="true"></div>
+<div id="progress" aria-hidden="true"></div>
 
-<!-- ============ 1. GERBANG PEMBUKA ============ -->
+<button id="musicBtn" class="music-btn" aria-label="Musik" title="Musik latar">🎵</button>
+<audio id="bgm" loop preload="none"><source src="assets/song.mp3" type="audio/mpeg"></audio>
+
+<!-- ============ 0. GERBANG ============ -->
 <section id="gate" class="screen">
   <div class="gate-inner">
     <div class="rose-big" aria-hidden="true">
-      <div class="rose">
-        <span></span><span></span><span></span><span></span><span></span>
-        <span></span><span></span><span></span>
-      </div>
+      <div class="rose"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
       <div class="stem"><i></i><i></i></div>
     </div>
-    <p class="to">Sebuah kejutan kecil untuk</p>
-    <h1 class="name-big">Sinta Liya</h1>
-    <p class="from">dari seseorang yang nggak pernah bisa berhenti kangen — <b>Ibah Misbah</b></p>
-    <button id="openBtn" class="btn big">Buka Hadiahnya 🎁</button>
-    <p class="hint">psst… siapin senyum dulu ya 😚</p>
+
+    <div id="gateStep1">
+      <p class="to">Verifikasi keamanan tingkat tinggi 🔒</p>
+      <h1 class="name-big">Kamu Sinta Liya?</h1>
+      <p class="from">Halaman ini cuma boleh dibuka oleh satu orang di dunia.</p>
+      <div class="gate-btns">
+        <button id="yesBtn" class="btn big">Iya, aku 🙋‍♀️</button>
+        <button id="noBtn" class="btn ghost no-btn">Bukan…</button>
+      </div>
+      <p id="noTease" class="hint">&nbsp;</p>
+    </div>
+
+    <div id="gateStep2" hidden>
+      <p class="to">Akses diberikan ✅</p>
+      <h1 class="name-big">Sinta Liya</h1>
+      <p class="from">Sebuah hadiah kecil dari seseorang yang nggak pernah berhenti kangen — <b>Ibah Misbah</b></p>
+      <button id="openBtn" class="btn big">Buka Hadiahnya 🎁</button>
+      <p class="hint">psst… nyalain suara & siapin senyum ya 😚</p>
+    </div>
   </div>
+  <div class="scroll-cue" aria-hidden="true"></div>
 </section>
 
 <main id="story" hidden>
 
-  <!-- ============ 2. UCAPAN ============ -->
+  <!-- ============ 1. UCAPAN ============ -->
   <section class="sec reveal" id="sec-ucapan">
     <div class="badge">01 — Ucapan</div>
     <h2 class="title">Happy <span class="grad">My Girl Day</span></h2>
     <div class="typed-wrap"><p id="typed" class="typed"></p><span class="caret"></span></div>
-    <div class="card letter">
+    <div class="card letter tilt">
+      <div class="stamp">🌹</div>
       <p>Hai sayangku, <b>Sinta Liya</b> 💌</p>
-      <p>Hari ini bukan hari besar buat dunia, tapi buat aku ini hari paling penting:
-      harinya kamu. Hari buat ngerayain satu manusia yang bikin hari-hari biasa jadi
-      kerasa spesial, yang ketawanya bisa bikin aku lupa capek, dan yang marahnya pun
+      <p>Hari ini mungkin biasa aja buat dunia. Tapi buat aku, ini hari paling penting:
+      <b>harinya kamu</b>. Hari buat ngerayain satu manusia yang bikin hal-hal biasa jadi
+      kerasa istimewa — yang ketawanya bisa bikin aku lupa capek, dan yang ngambeknya pun
       tetap kelihatan lucu (maaf ya, tapi beneran 🙈).</p>
-      <p>Makasih udah sabar sama aku, makasih udah jadi rumah yang bisa aku pulangin
-      kapan aja. Semoga kamu selalu sehat, selalu dilindungi, dan selalu punya alasan
-      buat senyum — kalau kehabisan alasan, panggil aku aja, aku bakal cariin.</p>
+      <p>Aku bukan orang yang pintar merangkai kata. Jadi aku rangkai halaman ini aja,
+      pelan-pelan, sambil senyum-senyum sendiri mikirin kamu. Setiap warna merah di sini,
+      setiap kelopak yang jatuh, itu aku yang nyusun satu-satu buat kamu.</p>
+      <p>Makasih udah sabar sama aku. Makasih udah jadi rumah yang bisa aku pulangin kapan aja.
+      Semoga kamu selalu sehat, selalu dijaga, dan selalu punya alasan buat senyum —
+      kalau kehabisan alasan, panggil aku, nanti aku cariin. Atau aku jadiin alasannya. 😌</p>
       <p class="sign">— Ibah Misbah, pacarmu yang paling berisik ❤️</p>
     </div>
   </section>
 
+  <!-- ============ 2. PENGHITUNG ============ -->
+  <section class="sec reveal" id="sec-counter">
+    <div class="badge">02 — Sudah Sejauh Ini</div>
+    <h2 class="title">Waktu bareng <span class="grad">kamu</span></h2>
+    <p class="sub">Dihitung dari hari pertama aku resmi jadi orang paling beruntung.</p>
+    <div class="clock" id="clock">
+      <div class="unit"><b id="cD">0</b><span>hari</span></div>
+      <div class="unit"><b id="cH">0</b><span>jam</span></div>
+      <div class="unit"><b id="cM">0</b><span>menit</span></div>
+      <div class="unit"><b id="cS">0</b><span>detik</span></div>
+    </div>
+    <div class="facts" id="facts"></div>
+  </section>
+
   <!-- ============ 3. MASKOT ============ -->
   <section class="sec reveal" id="sec-maskot">
-    <div class="badge">02 — Temen Kecil</div>
+    <div class="badge">03 — Temen Kecil</div>
     <h2 class="title">Ada yang mau <span class="grad">peluk kamu</span></h2>
-    <p class="sub">Colek dia, dia suka digangguin 👇</p>
+    <p class="sub">Namanya <b>Badtz</b>. Dia nakal, tapi sayang. Mirip siapa ya… 🤔</p>
+
     <div class="doll-stage">
       <button id="doll" class="doll" aria-label="Colek boneka">
-        <svg viewBox="0 0 220 240" width="200" height="218" aria-hidden="true">
-          <ellipse cx="110" cy="228" rx="70" ry="10" fill="rgba(0,0,0,.35)"/>
-          <!-- badan -->
-          <path d="M110 60c-52 0-78 36-78 86 0 44 34 72 78 72s78-28 78-72c0-50-26-86-78-86z" fill="#17171c"/>
-          <!-- perut -->
-          <ellipse cx="110" cy="166" rx="47" ry="46" fill="#fff"/>
-          <!-- tangan -->
-          <g class="arm-l"><path d="M38 128c-18 6-26 22-22 34 4 12 20 14 30 4z" fill="#17171c"/></g>
-          <g class="arm-r"><path d="M182 128c18 6 26 22 22 34-4 12-20 14-30 4z" fill="#17171c"/></g>
-          <!-- kaki -->
-          <ellipse cx="84" cy="214" rx="24" ry="12" fill="#ffc83d"/>
-          <ellipse cx="136" cy="214" rx="24" ry="12" fill="#ffc83d"/>
-          <!-- kepala -->
+        <svg viewBox="0 0 220 250" width="210" height="238" aria-hidden="true">
+          <ellipse cx="110" cy="236" rx="72" ry="10" fill="rgba(0,0,0,.4)"/>
+          <path d="M110 62c-52 0-78 36-78 86 0 44 34 72 78 72s78-28 78-72c0-50-26-86-78-86z" fill="#17171c"/>
+          <ellipse cx="110" cy="168" rx="47" ry="46" fill="#fff"/>
+          <g class="arm-l"><path d="M38 130c-18 6-26 22-22 34 4 12 20 14 30 4z" fill="#17171c"/></g>
+          <g class="arm-r"><path d="M182 130c18 6 26 22 22 34-4 12-20 14-30 4z" fill="#17171c"/></g>
+          <ellipse cx="84" cy="220" rx="25" ry="12" fill="#ffc83d"/>
+          <ellipse cx="136" cy="220" rx="25" ry="12" fill="#ffc83d"/>
           <path d="M110 18c-46 0-72 24-72 54s26 44 72 44 72-14 72-44-26-54-72-54z" fill="#17171c"/>
-          <!-- jambul duri -->
           <path d="M72 26l-14-18 26 8 6-20 12 18 12-18 6 20 26-8-14 18z" fill="#17171c"/>
-          <!-- mata -->
           <g class="eyes">
             <ellipse cx="86" cy="60" rx="15" ry="17" fill="#fff"/>
             <ellipse cx="134" cy="60" rx="15" ry="17" fill="#fff"/>
-            <circle class="pupil" cx="88" cy="63" r="7" fill="#111"/>
-            <circle class="pupil" cx="136" cy="63" r="7" fill="#111"/>
-            <circle cx="90" cy="60" r="2.4" fill="#fff"/>
-            <circle cx="138" cy="60" r="2.4" fill="#fff"/>
+            <g id="pupils">
+              <circle class="pupil" cx="87" cy="62" r="7" fill="#111"/>
+              <circle class="pupil" cx="135" cy="62" r="7" fill="#111"/>
+            </g>
           </g>
-          <!-- pipi -->
-          <ellipse class="blush" cx="64" cy="80" rx="9" ry="6" fill="#ff5f8d" opacity=".55"/>
-          <ellipse class="blush" cx="156" cy="80" rx="9" ry="6" fill="#ff5f8d" opacity=".55"/>
-          <!-- mulut nyengir -->
-          <path class="mouth" d="M92 86q18 20 36 0q-18 8-36 0z" fill="#ff8aa8" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
-          <!-- mawar di tangan -->
+          <ellipse class="blush" cx="62" cy="80" rx="10" ry="6.5" fill="#ff5f8d" opacity=".55"/>
+          <ellipse class="blush" cx="158" cy="80" rx="10" ry="6.5" fill="#ff5f8d" opacity=".55"/>
+          <path id="mouth" d="M92 86q18 20 36 0q-18 8-36 0z" fill="#ff8aa8" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
           <g class="mini-rose">
-            <path d="M196 158c0 18-6 30-6 30s-6-12-6-30" stroke="#2f9e44" stroke-width="4" fill="none"/>
-            <circle cx="190" cy="152" r="12" fill="#e01e4f"/>
-            <circle cx="190" cy="152" r="7" fill="#ff5177"/>
-            <circle cx="190" cy="152" r="3" fill="#ffd0dc"/>
+            <path d="M196 160c0 18-6 30-6 30s-6-12-6-30" stroke="#2f9e44" stroke-width="4" fill="none"/>
+            <circle cx="190" cy="154" r="12" fill="#e01e4f"/><circle cx="190" cy="154" r="7" fill="#ff5177"/>
+            <circle cx="190" cy="154" r="3" fill="#ffd0dc"/>
           </g>
+          <g id="bowtie" opacity="0"><path d="M90 112l-22-12v24z" fill="#e01e4f"/><path d="M130 112l22-12v24z" fill="#e01e4f"/><circle cx="110" cy="112" r="7" fill="#b3002d"/></g>
         </svg>
       </button>
       <div id="dollBubble" class="bubble">Halo Sinta! 🐧</div>
     </div>
-    <p class="sub tiny">* boneka pinguin hitam nakal kesukaan kamu, versi gambar tangan digital 😄</p>
+
+    <div class="doll-actions">
+      <button class="chip" data-act="peluk">🤗 Peluk</button>
+      <button class="chip" data-act="kasih">🍰 Kasih Kue</button>
+      <button class="chip" data-act="dandan">🎀 Dandanin</button>
+      <button class="chip" data-act="rahasia">🤫 Bisikin Rahasia</button>
+    </div>
+    <p class="sub tiny">Matanya ngikutin kamu lho. Coba gerakin kursor/jarimu 👀</p>
   </section>
 
-  <!-- ============ 4. MAWAR MERAH ============ -->
+  <!-- ============ 4. MAWAR ============ -->
   <section class="sec reveal" id="sec-mawar">
-    <div class="badge">03 — Mawar Merah</div>
+    <div class="badge">04 — Mawar Merah</div>
     <h2 class="title">Buket <span class="grad">mawar kesukaanmu</span></h2>
-    <p class="sub">Tap setiap tangkai — ada pesan rahasia di tiap kuntum 🌹</p>
+    <p class="sub">Tap tiap kuntum — ada pesan yang aku sembunyiin di dalamnya 🌹</p>
     <div id="bouquet" class="bouquet"></div>
     <p id="roseMsg" class="rose-msg">—</p>
-    <p id="roseCount" class="sub tiny">0 / 7 mawar dipetik</p>
+    <div class="meter"><i id="roseBar"></i></div>
+    <p id="roseCount" class="sub tiny">0 / 9 mawar dipetik</p>
   </section>
 
-  <!-- ============ 5. INTERAKSI SEBELUM VIDEO ============ -->
+  <!-- ============ 5. KUIS ============ -->
+  <section class="sec reveal" id="sec-kuis">
+    <div class="badge">05 — Kuis Pacar Teladan</div>
+    <h2 class="title">Tes kecil, <span class="grad">nggak boleh salah</span></h2>
+    <p class="sub">Tenang, soalnya gampang. Udah aku atur biar kamu menang 😌</p>
+    <div class="card quiz" id="quiz">
+      <p class="q" id="qText">—</p>
+      <div class="opts" id="qOpts"></div>
+      <p class="qfeed" id="qFeed">&nbsp;</p>
+      <p class="sub tiny" id="qProg"></p>
+    </div>
+  </section>
+
+  <!-- ============ 6. KUNCI VIDEO ============ -->
   <section class="sec reveal" id="sec-gift">
-    <div class="badge">04 — Kunci Kejutan</div>
+    <div class="badge">06 — Kunci Kejutan</div>
     <h2 class="title">Satu hal <span class="grad">sebelum videonya</span></h2>
-    <p class="sub">Tekan hatinya terus sampai penuh ya, sayang 💗</p>
+    <p class="sub"><b>Tahan</b> hatinya sampai penuh ya, sayang. Jangan dilepas 💗</p>
 
     <div class="lock-stage">
-      <button id="heartBtn" class="heart-btn" aria-label="Tekan hati">
-        <svg viewBox="0 0 120 110" width="170" height="156">
+      <button id="heartBtn" class="heart-btn" aria-label="Tahan hati">
+        <svg viewBox="0 0 120 112" width="186" height="174">
           <defs>
-            <clipPath id="hclip">
-              <path d="M60 104S8 72 8 38C8 19 22 8 37 8c10 0 18 5 23 13 5-8 13-13 23-13 15 0 29 11 29 30 0 34-52 66-52 66z"/>
-            </clipPath>
-            <linearGradient id="hg" x1="0" y1="1" x2="0" y2="0">
-              <stop offset="0%" stop-color="#ff2e63"/><stop offset="100%" stop-color="#ff8fab"/>
-            </linearGradient>
+            <clipPath id="hclip"><path d="M60 104S8 72 8 38C8 19 22 8 37 8c10 0 18 5 23 13 5-8 13-13 23-13 15 0 29 11 29 30 0 34-52 66-52 66z"/></clipPath>
+            <linearGradient id="hg" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#ff2e63"/><stop offset="100%" stop-color="#ffb3c7"/></linearGradient>
           </defs>
-          <path d="M60 104S8 72 8 38C8 19 22 8 37 8c10 0 18 5 23 13 5-8 13-13 23-13 15 0 29 11 29 30 0 34-52 66-52 66z"
-                fill="rgba(255,255,255,.07)" stroke="#ff7aa2" stroke-width="3"/>
-          <g clip-path="url(#hclip)">
-            <rect id="fill" x="0" y="110" width="120" height="110" fill="url(#hg)"/>
-          </g>
+          <path d="M60 104S8 72 8 38C8 19 22 8 37 8c10 0 18 5 23 13 5-8 13-13 23-13 15 0 29 11 29 30 0 34-52 66-52 66z" fill="rgba(255,255,255,.07)" stroke="#ff7aa2" stroke-width="3"/>
+          <g clip-path="url(#hclip)"><rect id="fill" x="0" y="112" width="120" height="112" fill="url(#hg)"/>
+          <path id="wave" d="" fill="rgba(255,255,255,.35)"/></g>
         </svg>
         <span id="heartPct" class="heart-pct">0%</span>
       </button>
-      <p id="heartTease" class="sub">ayo dong, jangan malu-malu 😳</p>
+      <p id="heartTease" class="sub">tekan dan <b>tahan</b> ya… 😳</p>
     </div>
 
     <div id="videoWrap" class="video-wrap" hidden>
       <div class="card video-card">
+        <div class="curtain" id="curtain"><i class="c-l"></i><i class="c-r"></i></div>
         <video id="theVideo" controls playsinline preload="metadata" poster="assets/video-poster.jpg">
           <source src="assets/video.mp4" type="video/mp4" />
           Browser kamu nggak support video.
         </video>
-        <p class="sub tiny">Letakkan video di <code>assets/video.mp4</code></p>
+        <p class="sub tiny">Letakkan videonya di <code>assets/video.mp4</code></p>
       </div>
     </div>
   </section>
 
-  <!-- ============ 6. SERTIFIKAT ============ -->
+  <!-- ============ 7. SERTIFIKAT ============ -->
   <section class="sec reveal" id="sec-cert">
-    <div class="badge">05 — Sertifikat</div>
+    <div class="badge">07 — Sertifikat</div>
     <h2 class="title">Sertifikat <span class="grad">My Girl Day</span></h2>
-    <p class="sub">Tinggal satu langkah: tanda tanganmu di kotak bawah 🖊️</p>
+    <p class="sub">Tinggal satu langkah terakhir: tanda tanganmu 🖊️</p>
 
     <div class="cert" id="cert">
       <div class="cert-border">
-        <div class="cert-seal">🌹</div>
+        <div class="cert-corner tl"></div><div class="cert-corner tr"></div>
+        <div class="cert-corner bl"></div><div class="cert-corner br"></div>
+        <div class="wax" id="wax">🌹</div>
         <p class="cert-kicker">S E R T I F I K A T &nbsp; R E S M I</p>
         <h3 class="cert-title">Happy My Girl Day</h3>
+        <div class="cert-rule"><i></i>🌹<i></i></div>
         <p class="cert-text">Dengan ini dinyatakan bahwa</p>
         <p class="cert-name">Sinta Liya</p>
         <p class="cert-text">
-          secara sah dan tanpa paksaan ditetapkan sebagai <b>Wanita Kesayangan</b>
-          satu-satunya dari <b>Ibah Misbah</b>, dengan hak istimewa berupa pelukan
-          tak terbatas, dibelain terus walaupun salah, dan dikangenin setiap hari.
-          Berlaku seumur hidup, tidak dapat dibatalkan 🤍
+          secara sah, sadar, dan tanpa paksaan sedikit pun ditetapkan sebagai
+          <b>Wanita Kesayangan</b> satu-satunya dari <b>Ibah Misbah</b>.
         </p>
+        <ul class="cert-perks">
+          <li>🤗 Pelukan tak terbatas, kapan pun diminta</li>
+          <li>🛡️ Dibelain terus, walaupun lagi salah</li>
+          <li>📞 Didengerin curhatnya sampai tuntas</li>
+          <li>🌹 Dikasih mawar merah tanpa perlu alasan</li>
+          <li>❤️ Dikangenin setiap hari, tanpa jeda</li>
+        </ul>
+        <p class="cert-text tiny-note">Berlaku seumur hidup. Tidak dapat dibatalkan, dialihkan, atau ditukar. 🤍</p>
 
         <div class="cert-signs">
           <div class="sign-col">
-            <div class="sign-slot">
-              <img id="sigImg" src="assets/signature.png" alt="Tanda tangan Ibah Misbah" />
-            </div>
+            <div class="sign-slot"><img id="sigImg" src="assets/signature.png" alt="Tanda tangan Ibah Misbah" /></div>
             <div class="sign-line"></div>
-            <p class="sign-name">Ibah Misbah</p>
-            <p class="sign-role">Pemberi Hadiah</p>
+            <p class="sign-name">Ibah Misbah</p><p class="sign-role">Pemberi Hadiah</p>
           </div>
           <div class="sign-col">
-            <div class="sign-slot">
-              <canvas id="sigPad" width="520" height="220"></canvas>
-              <span id="padHint" class="pad-hint">✍️ coret di sini</span>
-            </div>
+            <div class="sign-slot"><canvas id="sigPad" width="520" height="220"></canvas>
+              <span id="padHint" class="pad-hint">✍️ coret tanda tanganmu di sini</span></div>
             <div class="sign-line"></div>
-            <p class="sign-name">Sinta Liya</p>
-            <p class="sign-role">Penerima Hadiah</p>
+            <p class="sign-name">Sinta Liya</p><p class="sign-role">Penerima Hadiah</p>
           </div>
         </div>
         <p class="cert-date" id="certDate"></p>
@@ -197,18 +245,24 @@
 
     <div class="cert-actions">
       <button id="clearSig" class="btn ghost">Hapus Coretan</button>
-      <button id="saveCert" class="btn">Simpan Sertifikat 📜</button>
+      <button id="saveCert" class="btn">Sahkan &amp; Simpan 📜</button>
     </div>
     <p id="certStatus" class="sub tiny">Belum ditandatangani…</p>
   </section>
 
   <footer class="footer">
-    <p>Dibuat dengan ❤️, kopi, dan sedikit panik oleh <b>Ibah Misbah</b> untuk <b>Sinta Liya</b>.</p>
-    <p class="tiny">I love you, selalu. 🌹🐧</p>
+    <p class="hand">Dibuat dengan ❤️, kopi, dan sedikit panik<br>oleh Ibah Misbah untuk Sinta Liya.</p>
+    <p class="tiny">I love you. Selalu, nggak pakai syarat. 🌹🐧</p>
+    <button id="replay" class="chip">↺ Ulang dari awal</button>
   </footer>
 </main>
 
-<div id="finale" class="finale" hidden><div class="finale-text">I LOVE YOU, SINTA LIYA ❤️</div></div>
+<div id="finale" class="finale" hidden>
+  <div class="finale-inner">
+    <div class="finale-text">I LOVE YOU,<br>SINTA LIYA ❤️</div>
+    <p class="finale-sub">— Ibah Misbah</p>
+  </div>
+</div>
 
 <script src="script.js"></script>
 </body>
