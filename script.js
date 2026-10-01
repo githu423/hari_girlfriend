@@ -10,6 +10,13 @@ const CONFIG = {
   jadian: new Date(2026, 0, 1, 0, 0, 0),
 };
 
+const PREF = {
+  musicOn: true,        // musik nyala otomatis sejak awal
+  musicVolume: 0.80,    // 0 - 1
+  videoAutoplay: true,  // video jalan sendiri
+  videoDelay: 2000,     // jeda sebelum video mulai (milidetik)
+};
+
 /* ───────── penyimpanan (tahan refresh) ───────── */
 const KEY = "mygirlday-sinta-v1";
 const STATE = Object.assign({
@@ -18,9 +25,12 @@ const STATE = Object.assign({
   signature: "", sealed: false, gateOpen: false, music: false, loveIndex: 0
 }, (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })());
 let saveT;
-function save() { clearTimeout(saveT); saveT = setTimeout(() => {
-  try { localStorage.setItem(KEY, JSON.stringify(STATE)); } catch {} }, 120); }
-function resetAll() { try { localStorage.removeItem(KEY); } catch {} location.reload(); }
+function save() {
+  clearTimeout(saveT); saveT = setTimeout(() => {
+    try { localStorage.setItem(KEY, JSON.stringify(STATE)); } catch { }
+  }, 120);
+}
+function resetAll() { try { localStorage.removeItem(KEY); } catch { } location.reload(); }
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
@@ -34,9 +44,11 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const N = innerWidth < 600 ? 18 : 34;
   const size = () => { w = c.width = innerWidth; h = c.height = innerHeight; };
   size(); addEventListener("resize", size);
-  const mk = () => ({ x: rnd(0, w), y: rnd(-h, 0), r: rnd(5, 13), s: rnd(.3, 1.1), a: rnd(0, 6.28),
+  const mk = () => ({
+    x: rnd(0, w), y: rnd(-h, 0), r: rnd(5, 13), s: rnd(.3, 1.1), a: rnd(0, 6.28),
     va: rnd(-.025, .025), sw: rnd(0, 1.7), o: rnd(.25, .75),
-    c: Math.random() < .18 ? "#ffd27a" : "#ff2e63" });
+    c: Math.random() < .18 ? "#ffd27a" : "#ff2e63"
+  });
   for (let i = 0; i < N; i++) P.push(mk());
   (function loop() {
     x.clearRect(0, 0, w, h);
@@ -67,8 +79,10 @@ function burst(x, y, n = 8, chars = ["❤️", "💗", "💘", "🌹", "✨"]) {
     setTimeout(() => e.remove(), 1900);
   }
 }
-const burstAt = (el, n = 10, c) => { const r = el.getBoundingClientRect();
-  burst(r.left + r.width / 2, r.top + r.height / 2, n, c); };
+const burstAt = (el, n = 10, c) => {
+  const r = el.getBoundingClientRect();
+  burst(r.left + r.width / 2, r.top + r.height / 2, n, c);
+};
 addEventListener("click", (e) => { if (!e.target.closest("#sigPad,.icon-btn,.nav-btn")) burst(e.clientX, e.clientY, 3); });
 function flash() { const f = $("#flash"); f.classList.remove("on"); void f.offsetWidth; f.classList.add("on"); }
 
@@ -79,7 +93,7 @@ const TASKS = {
   doll: { done: false, msg: "Ajak Badtz main dulu dong, kasihan 🐧" },
   rose: { done: false, msg: "Petik minimal 3 mawar dulu ya 🌹" },
   quiz: { done: false, msg: "Selesaikan kuisnya dulu, gampang kok 😌" },
-  heart:{ done: false, msg: "Tahan hatinya sampai 100% dulu ya 💗" },
+  heart: { done: false, msg: "Tahan hatinya sampai 100% dulu ya 💗" },
   sign: { done: false, msg: "Tanda tangan dulu di kotaknya 🖊️" },
 };
 Object.keys(TASKS).forEach(k => { if (STATE.tasks[k]) TASKS[k].done = true; });
@@ -191,7 +205,7 @@ $("#yesBtn").addEventListener("click", (e) => { burst(e.clientX, e.clientY, 24);
 $("#envelope").addEventListener("click", (e) => {
   e.currentTarget.classList.add("open");
   burst(e.clientX, e.clientY, 18, ["💌", "❤️", "✨"]);
-  bgm.play().then(() => { mb.classList.add("on"); mb.textContent = "🎶"; }).catch(() => {});
+  bgm.play().then(() => { mb.classList.add("on"); mb.textContent = "🎶"; }).catch(() => { });
   setTimeout(() => go(2, 1), 650);
 });
 
@@ -361,16 +375,26 @@ if (STATE.roses && STATE.roses.length) {
 
 /* ───────── kuis ───────── */
 const QUIZ = [
-  { q: "Siapa wanita kesayangan Ibah Misbah?", o: ["Sinta Liya 🌹", "Sinta Liya (lagi)", "Ya… Sinta Liya lah"],
-    f: "Benar semua. Emang nggak ada opsi lain 😌" },
-  { q: "Bunga favoritmu apa hayo?", o: ["Mawar merah 🌹", "Mawar merah tapi banyak", "Mawar merah dari Ibah"],
-    f: "Yes! Dan stoknya seumur hidup ❤️" },
-  { q: "Seberapa sayang Ibah ke kamu?", o: ["Banyak banget", "Banyak banget ×1000", "Sampai bikin web ini"],
-    f: "Jawaban kamu kurang besar. Yang bener: semuanya 🤍" },
-  { q: "Kalau kamu ngambek, Ibah harus gimana?", o: ["Minta maaf dulu", "Beliin makanan", "Peluk, terus nggak dilepas"],
-    f: "Noted. Akan dilaksanakan seumur hidup 🫡" },
-  { q: "Terakhir: mau nggak dicintai Ibah terus-terusan?", o: ["Mau banget ❤️", "Iya dong", "Udah dari dulu"],
-    f: "Alhamdulillah. Perjanjian sah 🎉" }
+  {
+    q: "Siapa wanita kesayangan Ibah Misbah?", o: ["Sinta Liya 🌹", "Sinta Liya (lagi)", "Ya… Sinta Liya lah"],
+    f: "Benar semua. Emang nggak ada opsi lain 😌"
+  },
+  {
+    q: "Bunga favoritmu apa hayo?", o: ["Mawar merah 🌹", "Mawar merah tapi banyak", "Mawar merah dari Ibah"],
+    f: "Yes! Dan stoknya seumur hidup ❤️"
+  },
+  {
+    q: "Seberapa sayang Ibah ke kamu?", o: ["Banyak banget", "Banyak banget ×1000", "Sampai bikin web ini"],
+    f: "Jawaban kamu kurang besar. Yang bener: semuanya 🤍"
+  },
+  {
+    q: "Kalau kamu ngambek, Ibah harus gimana?", o: ["Minta maaf dulu", "Beliin makanan", "Peluk, terus nggak dilepas"],
+    f: "Noted. Akan dilaksanakan seumur hidup 🫡"
+  },
+  {
+    q: "Terakhir: mau nggak dicintai Ibah terus-terusan?", o: ["Mau banget ❤️", "Iya dong", "Udah dari dulu"],
+    f: "Alhamdulillah. Perjanjian sah 🎉"
+  }
 ];
 let qi = STATE.quizIndex | 0;
 function renderQ() {
@@ -489,7 +513,7 @@ pad.addEventListener("pointermove", (e) => {
     finishTask("sign");
   }
 });
-const endDraw = () => { if (!drawing) return; drawing = false; if (signed) { try { STATE.signature = pad.toDataURL("image/png"); save(); } catch {} } };
+const endDraw = () => { if (!drawing) return; drawing = false; if (signed) { try { STATE.signature = pad.toDataURL("image/png"); save(); } catch { } } };
 ["pointerup", "pointercancel", "pointerleave"].forEach(t => pad.addEventListener(t, endDraw));
 
 $("#clearSig").addEventListener("click", () => {
@@ -541,15 +565,17 @@ function wrap(c, text, x, y, maxW, lh) {
   c.fillText(line.trim(), x, yy); return yy + lh;
 }
 function loadImg(src) {
-  return new Promise((res) => { const i = new Image(); i.crossOrigin = "anonymous";
-    i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
+  return new Promise((res) => {
+    const i = new Image(); i.crossOrigin = "anonymous";
+    i.onload = () => res(i); i.onerror = () => res(null); i.src = src;
+  });
 }
 
 async function renderCertificate() {
   const cv = document.createElement("canvas");
   cv.width = CW; cv.height = CH;
   const c = cv.getContext("2d");
-  try { await document.fonts.ready; } catch {}
+  try { await document.fonts.ready; } catch { }
 
   /* latar krem bergradasi + tekstur lembut */
   const bg = c.createLinearGradient(0, 0, CW, CH);
@@ -630,8 +656,10 @@ async function renderCertificate() {
   const wg = c.createRadialGradient(-18, -20, 8, 0, 0, 86);
   wg.addColorStop(0, "#ff6b8c"); wg.addColorStop(1, "#8e0030");
   c.fillStyle = wg; c.beginPath();
-  for (let i = 0; i < 28; i++) { const a = i / 28 * 6.283, r = 80 + Math.sin(i * 3.1) * 7;
-    i ? c.lineTo(Math.cos(a) * r, Math.sin(a) * r) : c.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+  for (let i = 0; i < 28; i++) {
+    const a = i / 28 * 6.283, r = 80 + Math.sin(i * 3.1) * 7;
+    i ? c.lineTo(Math.cos(a) * r, Math.sin(a) * r) : c.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
   c.closePath(); c.fill();
   c.strokeStyle = "rgba(255,255,255,.4)"; c.lineWidth = 3; c.beginPath(); c.arc(0, 0, 60, 0, 6.3); c.stroke();
   drawRose(c, 0, 0, 34);
@@ -640,7 +668,7 @@ async function renderCertificate() {
   /* tanda tangan */
   const sigY = CH - 290, colW = 520;
   const cols = [{ x: cx - 330, name: CONFIG.aku, role: "Pemberi Hadiah" },
-                { x: cx + 330, name: CONFIG.pacar, role: "Penerima Hadiah" }];
+  { x: cx + 330, name: CONFIG.pacar, role: "Penerima Hadiah" }];
 
   const sigIbah = await loadImg("assets/signature.png");
   if (sigIbah && sigIbah.width) {
@@ -653,8 +681,10 @@ async function renderCertificate() {
 
   if (STATE.signature) {
     const si = await loadImg(STATE.signature);
-    if (si) { const h = 150, w = Math.min(colW - 40, si.width / si.height * h);
-      c.drawImage(si, cols[1].x - w / 2, sigY - h, w, h); }
+    if (si) {
+      const h = 150, w = Math.min(colW - 40, si.width / si.height * h);
+      c.drawImage(si, cols[1].x - w / 2, sigY - h, w, h);
+    }
   }
 
   cols.forEach(col => {
@@ -678,7 +708,7 @@ $("#saveCert").addEventListener("click", async () => {
   if (!signed) {
     $("#certStatus").textContent = "Eits… tanda tangan dulu dong di kotaknya 🖊️";
     pad.animate([{ transform: "translateX(0)" }, { transform: "translateX(-9px)" },
-      { transform: "translateX(9px)" }, { transform: "translateX(0)" }], { duration: 340 });
+    { transform: "translateX(9px)" }, { transform: "translateX(0)" }], { duration: 340 });
     return;
   }
   const btn = $("#saveCert"); btn.disabled = true;
